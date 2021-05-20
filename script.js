@@ -1,35 +1,35 @@
 const fs = require("fs");
 
-const createPathForDepth = (depth) => {
-    if (depth <= -1) return console.log("done");
-    let tmp = depth;
-    let relativePath;
-    const path = `./tmp/${depth}`;
-
+const creatFolder = (path, inside) => {
     try {
         if (!fs.existsSync(path)) {
             fs.mkdirSync(path);
-            while (tmp > -1) {
-                relativePath = `${path}/${tmp}`;
-                fs.mkdirSync(relativePath);
-                console.log("folder created", relativePath);
-                fs.writeFileSync(
-                    `${relativePath}/${tmp}.txt`,
-                    `relativePath = ${relativePath}/${tmp}.txt`
-                );
-                console.log("file created", tmp, ".txt");
-                tmp--;
-            }
+            console.log("folder created", path);
+            fs.writeFileSync(
+                `${path}/${inside}.txt`,
+                `relativePath = ${path}/${inside}.txt`
+            );
+            console.log("file created", path, ".txt");
         }
     } catch (err) {
         console.error(err);
     }
-    depth--;
-    createPathForDepth(depth);
 };
+const createTree = (n, w = 1, level = 0, path = "./tmp") => {
+    let relativePath = path;
+    for (var i = 0; i < w; i++) {
+        creatFolder(relativePath + `/${i}`, i);
 
+        if (n > 0) {
+            relativePath = path + `/${level}`;
+            creatFolder(relativePath, level);
+            createTree(n - 1, w + 1, level++, relativePath);
+        }
+    }
+    return;
+};
 if (process.argv[2] == "depth") {
-    createPathForDepth(process.argv[3]);
+    createTree(process.argv[3]);
 } else {
     console.log("invalid argument");
 }
